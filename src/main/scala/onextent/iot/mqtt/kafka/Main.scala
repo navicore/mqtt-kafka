@@ -1,19 +1,38 @@
 package onextent.iot.mqtt.kafka
 
-// import io.circe.generic.auto._
-// import io.github.mkotsur.aws.handler.Lambda._
-// import io.github.mkotsur.aws.handler.Lambda
-//
-// case class Ping(inputMsg: String)
-//
-// case class Pong(outputMsg: String)
-//
-// class Main extends Lambda[Ping, Pong] {
-//
-//   override def handle(ping: Ping) = Right(Pong(ping.inputMsg.reverse))
-//
-// }
+import akka.actor.{Actor, Props}
+import com.sandinh.paho.akka._
+import com.typesafe.scalalogging.LazyLogging
+import onextent.iot.mqtt.kafka.Conf._
 
-object Main extends App {
-  // got any helpful boilerplate for your users?
+object Main extends App with LazyLogging {
+
+  val psConfig =
+    PSConfig(brokerUrl = mqttUrl, conOpt = ConnOptions(mqttUser, mqttPwd).get)
+
+  val pubsub = actorSystem.actorOf(Props(classOf[MqttPubSub], psConfig))
+
+  class SubscribeActor extends Actor {
+
+    pubsub ! Subscribe(mqttTopic, self)
+
+    def receive: PartialFunction[Any, Unit] = {
+      case SubscribeAck(Subscribe(`mqttTopic`, `self`, _), fail) =>
+        if (fail.isEmpty) {
+          logger.info(s"connect is successful for topic $mqttTopic")
+          context become ready
+        } else
+          logger.error(s"Can't subscribe to $mqttTopic")
+    }
+
+    def ready: Receive = {
+      case msg: Message =>
+        logger.info(s"ejs got ${new String(msg.payload)} from ${msg.topic}")
+      case x =>
+        logger.warn(s"received unexpected type: $x")
+    }
+  }
+
+  actorSystem.actorOf(Props(classOf[SubscribeActor]))
+
 }

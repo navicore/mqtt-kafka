@@ -12,14 +12,26 @@ parallelExecution in test := false
 version := "1.0"
 
 scalaVersion := "2.12.6"
+val akkaVersion = "2.5.12"
 
 libraryDependencies ++=
   Seq(
-    "org.typelevel" %% "cats-core" % "1.0.1",
-    "com.chuusai" %% "shapeless" % "2.3.2",
-    "io.github.mkotsur" %% "aws-lambda-scala" % "0.0.10",
+
+    "ch.qos.logback" % "logback-classic" % "1.1.7",
+    "com.typesafe" % "config" % "1.2.1",
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
+
+    "com.newrelic.agent.java" % "newrelic-api" % "3.47.0",
+
+    "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+    "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+
+    "com.typesafe.akka" %% "akka-stream-kafka" % "0.20",
+
+    "com.sandinh" %% "paho-akka" % "1.5.0",
 
     "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+
   )
 
 mainClass in assembly := Some("onextent.iot.mqtt.kafka.Main")
