@@ -19,7 +19,6 @@ object Main extends App with LazyLogging {
     def receive: PartialFunction[Any, Unit] = {
       case SubscribeAck(Subscribe(`mqttTopic`, `self`, _), fail) =>
         if (fail.isEmpty) {
-          logger.info(s"connect is successful for topic $mqttTopic")
           context become ready
         } else
           logger.error(s"Can't subscribe to $mqttTopic")
