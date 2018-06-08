@@ -27,6 +27,15 @@ object SubStream extends LazyLogging {
       println(s"got one:\n$str")
 
     })
+
+    //todo: sink to kafka
+    //todo: sink to kafka
+    //todo: sink to kafka
+    //todo: sink to kafka
+    //todo: sink to kafka
+    //todo: sink to kafka
+    //todo: sink to kafka
+    //todo: sink to kafka
   }
 
 }

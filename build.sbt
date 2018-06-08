@@ -21,15 +21,9 @@ libraryDependencies ++=
     "com.typesafe" % "config" % "1.2.1",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
 
-    "com.newrelic.agent.java" % "newrelic-api" % "3.47.0",
-
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-
     "com.typesafe.akka" %% "akka-stream-kafka" % "0.20",
-
-    "com.sandinh" %% "paho-akka" % "1.5.0",
-
     "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "0.19",
 
     "org.scalatest" %% "scalatest" % "3.0.5" % "test"
