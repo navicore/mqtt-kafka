@@ -30,6 +30,8 @@ libraryDependencies ++=
 
     "com.sandinh" %% "paho-akka" % "1.5.0",
 
+    "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "0.19",
+
     "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
   )

@@ -1,12 +1,14 @@
 package onextent.iot.mqtt.kafka
 
 import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 
 object Conf extends Conf with LazyLogging {
 
   implicit val actorSystem: ActorSystem = ActorSystem("MqttKafka")
+  implicit val m: Materializer = ActorMaterializer(ActorMaterializerSettings(actorSystem))
 
 }
 
