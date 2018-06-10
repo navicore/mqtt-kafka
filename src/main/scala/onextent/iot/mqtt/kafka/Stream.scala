@@ -13,12 +13,15 @@ import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
 import onextent.iot.mqtt.kafka.Conf._
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
+import org.apache.kafka.common.serialization.{
+  ByteArraySerializer,
+  StringSerializer
+}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 
 import scala.concurrent.Future
 
-object SubStream extends LazyLogging {
+object Stream extends LazyLogging {
 
   def getKey(text: String): String = {
     import onextent.data.navipath.dsl.NaviPathSyntax._
@@ -27,16 +30,16 @@ object SubStream extends LazyLogging {
       .getOrElse(text.hashCode().toString)
   }
 
-  val settings = MqttSourceSettings(
+  val mqttConsumerettings = MqttSourceSettings(
     MqttConnectionSettings(
       mqttUrl,
       "test-client",
       new MemoryPersistence
     ).withAuth(mqttUser, mqttPwd),
-    Map(mqttTopic -> MqttQoS.AtMostOnce)
+    Map(mqttTopic -> MqttQoS.AtLeastOnce)
   )
 
-  val producerSettings: ProducerSettings[Array[Byte], String] =
+  val kafkaProducerSettings: ProducerSettings[Array[Byte], String] =
     ProducerSettings(actorSystem, new ByteArraySerializer, new StringSerializer)
       .withBootstrapServers(bootstrap)
 
@@ -54,27 +57,24 @@ object SubStream extends LazyLogging {
         )
         val c = new Committable {
           override def commitScaladsl(): Future[Done] = {
-            logger.debug(s"committing key $key to topic $mqttTopic")
+            logger.debug(
+              s"kafka write complete. committing mqtt msg for key $key with topic $mqttTopic")
             msg.messageArrivedComplete()
           }
           override def commitJavadsl(): CompletionStage[Done] =
-            throw new java.lang.UnsupportedOperationException(
-              "java api not implemented")
+            throw new java.lang.UnsupportedOperationException()
         }
-        val message: Message[Array[Byte], String, Committable] =
-          Message(record, c)
-        logger.debug(s"writing key $key to topic $mqttTopic")
-        message
+        Message(record, c)
       })
 
   def apply(): Unit = {
 
     val mqttSource: Source[MqttCommittableMessage, Future[Done]] =
-      MqttSource.atLeastOnce(settings, bufferSize = 8)
+      MqttSource.atLeastOnce(mqttConsumerettings, bufferSize = 8)
 
     mqttSource
       .via(committable)
-      .runWith(Producer.commitableSink(producerSettings))
+      .runWith(Producer.commitableSink(kafkaProducerSettings))
 
   }
 
