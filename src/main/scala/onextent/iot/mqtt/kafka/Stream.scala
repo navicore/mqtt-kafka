@@ -58,7 +58,7 @@ object Stream extends LazyLogging {
         val c = new Committable {
           override def commitScaladsl(): Future[Done] = {
             logger.debug(
-              s"kafka write complete. committing mqtt msg for key $key with topic $mqttTopic")
+              s"wrote $key to kafka topic $kafkaTopic. mqtt ack done.")
             msg.messageArrivedComplete()
           }
           override def commitJavadsl(): CompletionStage[Done] =
