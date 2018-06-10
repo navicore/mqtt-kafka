@@ -1,41 +1,81 @@
 package onextent.iot.mqtt.kafka
 
+import java.util.concurrent.CompletionStage
+
+import akka.kafka.ConsumerMessage.Committable
+import akka.kafka.ProducerMessage.Message
+import akka.kafka.ProducerSettings
+import akka.kafka.scaladsl.Producer
 import akka.stream.alpakka.mqtt._
-import akka.stream.alpakka.mqtt.scaladsl.MqttSource
+import akka.stream.alpakka.mqtt.scaladsl.{MqttCommittableMessage, MqttSource}
+import akka.stream.scaladsl.{Flow, Source}
+import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
 import onextent.iot.mqtt.kafka.Conf._
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
+
+import scala.concurrent.Future
 
 object SubStream extends LazyLogging {
 
+  def getKey(text: String): String = {
+    import onextent.data.navipath.dsl.NaviPathSyntax._
+    text
+      .query[String]("$.DevAddr")
+      .getOrElse(text.hashCode().toString)
+  }
+
+  val settings = MqttSourceSettings(
+    MqttConnectionSettings(
+      mqttUrl,
+      "test-client",
+      new MemoryPersistence
+    ).withAuth(mqttUser, mqttPwd),
+    Map(mqttTopic -> MqttQoS.AtMostOnce)
+  )
+
+  val producerSettings: ProducerSettings[Array[Byte], String] =
+    ProducerSettings(actorSystem, new ByteArraySerializer, new StringSerializer)
+      .withBootstrapServers(bootstrap)
+
+  def committable: Flow[MqttCommittableMessage,
+                        Message[Array[Byte], String, Committable],
+                        NotUsed] =
+    Flow[MqttCommittableMessage]
+      .map((msg: MqttCommittableMessage) => {
+        val payloadStr = new String(msg.message.payload.toArray, "UTF8")
+        val key = getKey(payloadStr)
+        val record = new ProducerRecord[Array[Byte], String](
+          mqttTopic,
+          key.getBytes("UTF8"),
+          payloadStr
+        )
+        val c = new Committable {
+          override def commitScaladsl(): Future[Done] = {
+            logger.debug(s"committing key $key to topic $mqttTopic")
+            msg.messageArrivedComplete()
+          }
+          override def commitJavadsl(): CompletionStage[Done] =
+            throw new java.lang.UnsupportedOperationException(
+              "java api not implemented")
+        }
+        val message: Message[Array[Byte], String, Committable] =
+          Message(record, c)
+        logger.debug(s"writing key $key to topic $mqttTopic")
+        message
+      })
+
   def apply(): Unit = {
 
-    val settings = MqttSourceSettings(
-      MqttConnectionSettings(
-        mqttUrl,
-        "test-client",
-        new MemoryPersistence
-      ).withAuth(mqttUser, mqttPwd),
-      Map(mqttTopic -> MqttQoS.AtMostOnce)
-    )
+    val mqttSource: Source[MqttCommittableMessage, Future[Done]] =
+      MqttSource.atLeastOnce(settings, bufferSize = 8)
 
-    val mqttSource = MqttSource.atMostOnce(settings, bufferSize = 8)
-    mqttSource.runForeach(m => {
+    mqttSource
+      .via(committable)
+      .runWith(Producer.commitableSink(producerSettings))
 
-      val str = new String(m.payload.toArray)
-
-      println(s"got one:\n$str")
-
-    })
-
-    //todo: sink to kafka
-    //todo: sink to kafka
-    //todo: sink to kafka
-    //todo: sink to kafka
-    //todo: sink to kafka
-    //todo: sink to kafka
-    //todo: sink to kafka
-    //todo: sink to kafka
   }
 
 }

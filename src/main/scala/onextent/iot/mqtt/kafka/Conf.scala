@@ -16,6 +16,8 @@ trait Conf {
 
   val conf: Config = ConfigFactory.load()
 
+  val bootstrap: String = conf.getString("kafka.bootstrap")
+
   val mqttUrl: String = conf.getString("mqtt.url")
   val mqttUser: String = conf.getString("mqtt.user")
   val mqttPwd: String = conf.getString("mqtt.pwd")
