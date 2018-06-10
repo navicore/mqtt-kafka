@@ -12,11 +12,11 @@ object SubStream extends LazyLogging {
 
     val settings = MqttSourceSettings(
       MqttConnectionSettings(
-        "ssl://iot.onextent.com:8883",
+        mqttUrl,
         "test-client",
         new MemoryPersistence
       ).withAuth(mqttUser, mqttPwd),
-      Map("test" -> MqttQoS.AtMostOnce)
+      Map(mqttTopic -> MqttQoS.AtMostOnce)
     )
 
     val mqttSource = MqttSource.atMostOnce(settings, bufferSize = 8)
