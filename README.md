@@ -1,3 +1,9 @@
+[![Build Status](https://travis-ci.org/navicore/mqtt-kafka.svg?branch=master)](https://travis-ci.org/navicore/mqtt-kafka)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4cd60495891a4573b91af11cf69943ef)](https://www.codacy.com/app/navicore/mqtt-kafka?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=navicore/mqtt-kafka&amp;utm_campaign=Badge_Grade)
+
+MQTT Kafka
+====
+
 Working Scala example of listening to an MQTT broker via TLS and writing to Kafka with an MQTT QOS callback acknowledging each "AtLeastOnce" MQTT msg as it is written to Kafka.
 
 
