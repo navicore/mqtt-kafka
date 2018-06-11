@@ -35,7 +35,7 @@ object Stream extends LazyLogging {
       mqttUrl,
       "test-client",
       new MemoryPersistence
-    ).withAuth(mqttUser, mqttPwd),
+    ).withAuth(mqttUser, mqttPwd).withAutomaticReconnect(true),
     Map(mqttTopic -> MqttQoS.AtLeastOnce)
   )
 
