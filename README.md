@@ -4,7 +4,7 @@
 MQTT Kafka
 ====
 
-Working Scala example of listening to an MQTT broker via TLS and writing to Kafka with an MQTT QOS callback acknowledging each "AtLeastOnce" MQTT msg as it is written to Kafka.
+Working Scala Akka Streams example of listening to an MQTT broker via TLS and writing to Kafka with an MQTT QOS callback acknowledging each "AtLeastOnce" MQTT msg as it is written to Kafka.
 
 
 ```console
