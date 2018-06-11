@@ -33,7 +33,7 @@ object Stream extends LazyLogging {
   val mqttConsumerettings = MqttSourceSettings(
     MqttConnectionSettings(
       mqttUrl,
-      "test-client",
+      mqttClientId,
       new MemoryPersistence
     ).withAuth(mqttUser, mqttPwd).withAutomaticReconnect(true),
     Map(mqttTopic -> MqttQoS.AtLeastOnce)
