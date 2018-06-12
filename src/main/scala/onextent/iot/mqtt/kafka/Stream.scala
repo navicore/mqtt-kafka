@@ -2,6 +2,7 @@ package onextent.iot.mqtt.kafka
 
 import java.util.concurrent.CompletionStage
 
+import scala.concurrent.duration._
 import akka.kafka.ConsumerMessage.Committable
 import akka.kafka.ProducerMessage.Message
 import akka.kafka.ProducerSettings
@@ -13,13 +14,12 @@ import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.LazyLogging
 import onextent.iot.mqtt.kafka.Conf._
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.{
-  ByteArraySerializer,
-  StringSerializer
-}
+import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 
+import scala.collection.immutable.Map
 import scala.concurrent.Future
+import scala.language.implicitConversions
 
 object Stream extends LazyLogging {
 
@@ -35,7 +35,9 @@ object Stream extends LazyLogging {
       mqttUrl,
       mqttClientId,
       new MemoryPersistence
-    ).withAuth(mqttUser, mqttPwd).withAutomaticReconnect(true),
+    ).withAuth(mqttUser, mqttPwd)
+      .withAutomaticReconnect(true)
+      .withKeepAliveInterval(15, SECONDS),
     Map(mqttTopic -> MqttQoS.AtLeastOnce)
   )
 
