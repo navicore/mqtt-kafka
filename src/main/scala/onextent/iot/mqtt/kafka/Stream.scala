@@ -53,7 +53,7 @@ object Stream extends LazyLogging {
         val payloadStr = new String(msg.message.payload.toArray, "UTF8")
         val key = getKey(payloadStr)
         val record = new ProducerRecord[Array[Byte], String](
-          mqttTopic,
+          kafkaTopic,
           key.getBytes("UTF8"),
           payloadStr
         )
