@@ -12,7 +12,7 @@ docker run -d --name my-kafka -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=`i
 ```
 
 ```console
-sbt assembly && MQTT_URL=ssl://YOUR_HOST:8883 MQTT_TOPIC=test MQTT_USER=YOUR_USER MQTT_PWD=YOUR_PWD java -jar target/scala-2.12/MqttKafka.jar
+sbt assembly && MQTT_URL=ssl://YOUR_HOST:8883 MQTT_TOPIC=test/c/ MQTT_CLIENT_ID=YOUR_CLIENT_ID MQTT_USER=YOUR_USER MQTT_PWD=YOUR_PWD java -jar target/scala-2.12/MqttKafka.jar
 ```
 
 ```console
