@@ -1,3 +1,8 @@
+<!-- ghmig:moved -->
+> **This repository has moved to [https://git.navicore.tech/navicore/mqtt-kafka](https://git.navicore.tech/navicore/mqtt-kafka).**
+>
+> The GitHub copy is archived and no longer maintained.
+
 [![Build Status](https://travis-ci.org/navicore/mqtt-kafka.svg?branch=master)](https://travis-ci.org/navicore/mqtt-kafka)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4cd60495891a4573b91af11cf69943ef)](https://www.codacy.com/app/navicore/mqtt-kafka?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=navicore/mqtt-kafka&amp;utm_campaign=Badge_Grade)
 
@@ -18,4 +23,3 @@ sbt assembly && MQTT_URL=ssl://YOUR_HOST:8883 MQTT_TOPIC=test/c/ MQTT_CLIENT_ID=
 ```console
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
 ```
-
